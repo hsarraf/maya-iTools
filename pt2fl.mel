@@ -1,0 +1,127 @@
+if (`window  -exists  pt2fl_window`)
+  deleteUI    pt2fl_window;
+
+window -t "PT2FL"  pt2fl_window;
+columnLayout   -adj 1;
+  textFieldButtonGrp -l "Particle System"   -bl "set"   -adj 1   -cal 1 left    -bc pt2fl_ps_proc   -en 1    pt2fl_particleSystem_textField;
+  textFieldButtonGrp -l "Fluid Container"   -bl "set"   -adj 1   -cal 1 left    -bc pt2fl_fc_proc   -en 1    pt2fl_fluidContainer_textField;
+  checkBoxGrp -l  "Use opacityPP as densityPV"  -v1 1  -adj 1  -cal 1 left    pt2fl_uoad_checkbox;
+  checkBoxGrp -l  "Use opacityPP as temperaturePV"  -v1 0  -adj 1  -cal 1 left    pt2fl_uoat_checkbox;
+  checkBoxGrp -l  "Use opacityPP as fuelPV"  -v1 0  -adj 1  -cal 1 left    pt2fl_uoaf_checkbox;
+  checkBoxGrp -l  "Use velocityPP as velocityPV"  -v1 0  -adj 1  -cal 1 left    pt2fl_uvav_checkbox;  
+  checkBoxGrp -l  "Use rgbPP as colorPV"  -v1 0  -adj 1  -cal 1 left    pt2fl_urac_checkbox;  
+  separator  -h 10 ;
+  button -l "Generate"   -c  pt2fl_generate_proc;
+  
+showWindow pt2fl_window;
+  
+  
+  
+  
+
+global proc   pt2fl_ps_proc() {
+  string $particle;
+  string $selectionList[] = `ls -sl`;
+  if (size( $selectionList ) == 0)
+     error( "No object is selected!!" );   
+  if (size( $selectionList ) > 1)
+     error( "More than one object is selected!!" );
+  if (`nodeType $selectionList[0]` == "transform") {
+      $selectionList = `ls -sl -dag -ap -s`;
+      if (`nodeType $selectionList[0]` == "particle")
+          $particle = $selectionList[0];
+      else
+          error( "No particle system is selected!!" );
+  }
+  else if (`nodeType $selectionList[0]` != "particle")
+      error( "No particle system is selected!!" );
+  else
+      $particle = $selectionList[0];
+      
+  textFieldButtonGrp -e -text    $particle   pt2fl_particleSystem_textField; 
+}
+
+
+
+
+global proc   pt2fl_fc_proc() {
+  string $fluidShape;
+  string $selectionList[] = `ls -sl`;
+  if (size( $selectionList ) == 0)
+     error( "No object is selected!!" );   
+  if (size( $selectionList ) > 1)
+     error( "More than one object is selected!!" );
+  if (`nodeType $selectionList[0]` == "transform") {
+      $selectionList = `ls -sl -dag -ap -s`;
+      if (`nodeType $selectionList[0]` == "fluidShape")
+          $fluidShape = $selectionList[0];
+      else
+          error( "No fluidShape is selected!!" );
+  }
+  else if (`nodeType $selectionList[0]` != "fluidShape")
+      error( "No fluidShape is selected!!" );
+  else
+      $fluidShape = $selectionList[0];
+      
+  textFieldButtonGrp -e -text    $fluidShape   pt2fl_fluidContainer_textField; 
+}
+
+
+
+
+global proc    pt2fl_generate_proc() {
+  global float $pt2fl_ptPos_float3[3];
+  global int   $pt2fl_voxelIndx_int3[3];
+  string   $particleShape = `textFieldButtonGrp -q -text  pt2fl_particleSystem_textField`;
+  string   $fluidShape = `textFieldButtonGrp -q -text  pt2fl_fluidContainer_textField`;
+  string $pt2fl_expressionStr_string = "$pt2fl_ptPos_float3 =  " + $particleShape + ".worldPosition;\n" + 
+  "$pt2fl_voxelIndx_int3 = `fluidVoxelInfo -v  $pt2fl_ptPos_float3[0] $pt2fl_ptPos_float3[1] $pt2fl_ptPos_float3[2] " + $fluidShape + "`;\n" + 
+  "if (`fluidVoxelInfo  -ib  ($pt2fl_voxelIndx_int3[0])  ($pt2fl_voxelIndx_int3[1])  ($pt2fl_voxelIndx_int3[2]) " + $fluidShape + "`) {\n";
+//  "\tsetFluidAttr -at density  -fv 1.0  -xi ($pt2fl_voxelIndx_int3[0])  -yi ($pt2fl_voxelIndx_int3[1])  -zi ($pt2fl_voxelIndx_int3[2]) " + $fluidShape + ";\n";
+  
+  if (`checkBoxGrp -q  -v1   pt2fl_uoad_checkbox`) {
+    if (!`attributeExists "opacityPP"  $particleShape`)
+      addAttr -ln "opacityPP" -dt doubleArray $particleShape;      
+    global float $pt2fl_density_float;
+    $pt2fl_expressionStr_string += "\t$pt2fl_density_float = " + $particleShape + ".opacityPP;\n" +
+    "\tsetFluidAttr -at density  -fv $pt2fl_density_float  -xi ($pt2fl_voxelIndx_int3[0])  -yi ($pt2fl_voxelIndx_int3[1])  -zi ($pt2fl_voxelIndx_int3[2]) " + $fluidShape + ";\n";      
+  } 
+  
+  if (`checkBoxGrp -q  -v1   pt2fl_uoat_checkbox`) {
+    if (!`attributeExists "opacityPP"  $particleShape`)
+      addAttr -ln "opacityPP" -dt doubleArray $particleShape;      
+    global float $pt2fl_temperature_float;
+    $pt2fl_expressionStr_string += "\t$pt2fl_temperature_float = " + $particleShape + ".opacityPP;\n" +
+    "\tsetFluidAttr -at temperature  -fv $pt2fl_temperature_float  -xi ($pt2fl_voxelIndx_int3[0])  -yi ($pt2fl_voxelIndx_int3[1])  -zi ($pt2fl_voxelIndx_int3[2]) " + $fluidShape + ";\n";      
+  }
+  
+  if (`checkBoxGrp -q  -v1   pt2fl_uoaf_checkbox`) {
+    if (!`attributeExists "opacityPP"  $particleShape`)
+      addAttr -ln "opacityPP" -dt doubleArray $particleShape;      
+    global float $pt2fl_fuel_float;
+    $pt2fl_expressionStr_string += "\t$pt2fl_fuel_float = " + $particleShape + ".opacityPP;\n" +
+    "\tsetFluidAttr -at fuel  -fv $pt2fl_density_float  -xi ($pt2fl_voxelIndx_int3[0])  -yi ($pt2fl_voxelIndx_int3[1])  -zi ($pt2fl_voxelIndx_int3[2]) " + $fluidShape + ";\n";      
+  }
+  
+  if (`checkBoxGrp -q  -v1   pt2fl_uvav_checkbox`) {
+    if (!`attributeExists "velocity"  $particleShape`)
+      addAttr -ln "velocity" -dt doubleArray $particleShape;      
+    global float $pt2fl_velocity_float3[3];
+    $pt2fl_expressionStr_string += "\t$pt2fl_velocity_float = " + $particleShape + ".velocity;\n" +
+    "\tsetFluidAttr -at velocity  -vv  $pt2fl_velocity_float3[0] $pt2fl_velocity_float3[1] $pt2fl_velocity_float3[2] -xi ($pt2fl_voxelIndx_int3[0])  -yi ($pt2fl_voxelIndx_int3[1])  -zi ($pt2fl_voxelIndx_int3[2]) " + $fluidShape + ";\n";      
+  }
+
+  if (`checkBoxGrp -q  -v1   pt2fl_urac_checkbox`) {
+    if (!`attributeExists "rgbPP"  $particleShape`)
+      addAttr -ln "rgbPP" -dt vectorArray $particleShape;      
+    global float $pt2fl_color_float3[3];
+    $pt2fl_expressionStr_string +=   "\t$pt2fl_color_float3 = " + $particleShape + ".rgbPP;\n" +
+    "\tsetFluidAttr -at color  -vv $pt2fl_color_float3[0] $pt2fl_color_float3[1] $pt2fl_color_float3[2]  -xi ($pt2fl_voxelIndx_int3[0])  -yi ($pt2fl_voxelIndx_int3[1])  -zi ($pt2fl_voxelIndx_int3[2]) " + $fluidShape + ";\n";
+  } 
+
+
+  $pt2fl_expressionStr_string += "}";
+  
+  dynExpression -s $pt2fl_expressionStr_string   -rbd    $particleShape;
+}
+

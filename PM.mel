@@ -1,0 +1,251 @@
+global proc GUI_PM() {
+
+if (`window -exists   texManager_Win_TM`)
+  deleteUI    texManager_Win_TM;
+
+window -t "Texture Manager"		texManager_Win_TM;
+columnLayout -adj 1;
+
+string $currentProjectPath = `workspace -fn`;
+text -l $currentProjectPath   currentProjectPath_Txt_PM;
+button -l "Set Project"    -h 18  -c setProject_Proc_PM;
+
+separator -h 15;
+
+frameLayout -l  "File Transfer";
+  rowLayout  -nc  3 -adj 1 -cal 1 left;
+    columnLayout -adj 1;
+      textScrollList -numberOfRows 15  -ams 1  -en 1  sourceFileList_Txt_PM;
+      button -l "Load Current Project"  -c  loadSourceFileList_Proc_PM;
+    setParent..;
+    button -l "->"  -c "transferFile_Proc_PM";
+    columnLayout -adj 1;
+      textScrollList -numberOfRows 15  -en 1 currentProject_Txt_PM;
+      button -l "Load Current Project"  -c "loadCurrentProject_Proc_PM";
+    setParent..;
+  setParent..;
+setParent..;
+
+
+frameLayout -l  "File Transfer";
+  rowLayout  -nc  2 -adj 1 -cal 1 left;
+    textFieldGrp -l "Textures Folder Name"  -text "sourceimages"	-h 18 -adj 1  -cal 1 left texFolderName_Tf_TM;
+    button -l "Generate" -h 18 -c "generateTex_Proc_TM";
+  setParent..;
+setParent..;
+
+frameLayout -l  "Log";
+  columnLayout -adj 1;
+   textScrollList -numberOfRows 15  -en 1  log_Txt_TM;
+   button -l "Clean Log" -h 18 -c "textScrollList -e -ra  log_Txt_TM";
+  setParent..;
+setParent..;
+
+showWindow   texManager_Win_TM;
+
+}
+
+
+global string $sourceFileDir = "";
+global string $targetFileDir = "";
+
+
+global proc   transferFile_Proc_PM() {
+  global string $sourceFileDir;
+  global string $targetFileDir;
+  if ( ($sourceFileDir != "") && ($targetFileDir != "") )
+    if ( (`textScrollList -q -nsi  sourceFileList_Txt_PM`)  &&  (`textScrollList -q -nsi  currentProject_Txt_PM`) ) {
+      string $selectedTargetFiles[] = `textScrollList -q -si  currentProject_Txt_PM`;
+      string $selectedTargetFile = $selectedTargetFiles[0];
+      string $selectedSourceFiles[] = `textScrollList -q -si  sourceFileList_Txt_PM`;
+      string $this;
+      for ($this in $selectedSourceFiles) {
+        string $sourcePath = $sourceFileDir + $this;
+        string $targetPath = $targetFileDir + $selectedTargetFile + "/" + $this;
+        sysFile -copy  $targetPath  $sourcePath;
+        string $log = "copied -- " + $sourcePath + "\t->\t" + $targetPath;
+        textScrollList -e -append  $log   log_Txt_TM;
+      }  // end for
+    }  // end inner if
+}  // end proc  <transferFile_Proc_PM>
+    
+
+
+global proc   loadSourceFileList_Proc_PM() {
+  string $fileL[] = `fileDialog2 -ff ("sfsdf (*.e)")`;
+  string $parts[];
+  tokenize   $fileL[0] "." $parts;
+  string $file = $parts[0] + "/";
+  string $files[] = `getFileList -fld $file`;
+  string $this;
+  for ($this in $files)
+    textScrollList -e  -append  $this   sourceFileList_Txt_PM;
+  global string $sourceFileDir;
+  $sourceFileDir = $file;
+}  // end proc   <loadSourceFileList_Proc_PM>
+
+
+
+
+global proc   loadCurrentProject_Proc_PM() {
+  string $projPath = `workspace -fn` + "/"; 
+  string $files[] = `getFileList -fld $projPath`;
+  string $this;
+  for ($this in $files)
+    textScrollList -e  -append  $this   currentProject_Txt_PM;
+  global string $targetFileDir;
+  $targetFileDir = $projPath;
+}  // end proc  <loadCurrentProject_Proc_PM>
+
+
+
+
+global proc    setProject_Proc_PM() {          // sets the new project
+  setProject "";
+  text -e -l  `workspace -fn` currentProjectPath_Txt_PM;
+}
+
+
+
+
+global proc   generateTex_Proc_TM() {		//  the main proc to generate the task of copying and changing the files
+
+global string $gMainProgressBar;	// recall the global string for progress bar
+
+string $texList[] = `ls -typ file`;	//  list all the texture files
+string $thisTex;
+
+
+progressBar -edit	//  edit the progress bar based on the calculation
+    -beginProgress
+    -isInterruptable true
+    -status "Calculation Texture Manager..."
+    -minValue 0
+    -maxValue (max( 1, (size( $texList )) ))
+    $gMainProgressBar;
+    
+
+for ($thisTex in $texList) {	// move on every texture file
+
+  string $currentTexPath = `getAttr ($thisTex + ".fileTextureName")`;  //  get the current texture file name
+    
+  string $texLocation = `textFieldGrp -q -text   texFolderName_Tf_TM`;  // get the texture location given by the user, default sourceimages
+  string $targetTexPath = `workspace -fn` + "/" + $texLocation + "/" + getTexFileName_Proc_TM( $currentTexPath );	// make the target path based on the current project  
+  
+  int $pathType = checkPathType_Proc_PM( $currentTexPath );    // checks the type of the path <full/proj>  
+  
+  if ($pathType == 1) {    // so it is a full path
+    if (`filetest -e  $currentTexPath`) {    // exists
+      print( $currentTexPath );
+      if ($targetTexPath == $currentTexPath) {
+          string $log = "not copied -- " + "the file, " + $targetTexPath + "  already existed";        // log
+          textScrollList -e -append  $log   log_Txt_TM;
+          continue;
+      }  // end if ($targetTexPath == $currentTexPath)
+      sysFile -copy  $targetTexPath   $currentTexPath;
+      string $projPath = fullPath2ProjPath_Proc_PM( $targetTexPath );
+      setAttr -type "string" ($thisTex + ".fileTextureName") $projPath; 
+      string $log = "copied -- " + $currentTexPath + " --> " + $targetTexPath;        // log
+      textScrollList -e -append  $log   log_Txt_TM;                  //  write log
+    } // end if <exists>
+    else {   // doesn't exist
+      string $log = "failed -- the file, " + $currentTexPath + "  doesn't exist";
+      textScrollList -e -append  $log   log_Txt_TM;    
+    }  // end else  <exists>
+  } // end if <pathType>
+  
+
+  else if ($pathType == 2) {    // so it is a project path
+    string $fullPath = projPath2FullPath_Proc_PM( $currentTexPath );
+    if (`filetest -e  $fullPath`) {    // exists
+      string $log = "not copied -- " + "the file, " + $fullPath + "  already existed";        // log
+      textScrollList -e -append  $log   log_Txt_TM;                  //  write log
+    } // end inner if <exists> 
+    else {   // doesn't exist
+      string $log = "failed -- the file, " + $fullPath + "  doesn't exist";
+      textScrollList -e -append  $log   log_Txt_TM;                  //  write log    
+    }  // end else  <exists>
+  } // end if
+  
+  
+
+  progressBar -edit -step 1 $gMainProgressBar;	  // step over the progress bar
+
+} //  end for
+
+progressBar -edit	//  end the progress bar
+    -endProgress
+    $gMainProgressBar;
+
+
+} //  end proc   generate_Proc_TM
+
+/*
+global proc    checktexFile_Proc_TM() {
+
+}
+*/
+
+
+
+global proc    string projPath2FullPath_Proc_PM (string $texPath) {
+  string $texLocation = `textFieldGrp -q -text   texFolderName_Tf_TM`;  // get the texture location given by the user, default sourceimages
+  return  `workspace -fn` + "/" + $texLocation + "/" + getTexFileName_Proc_TM( $texPath );
+}  // end proc   <projPath2FullPath_Proc_PM>
+
+
+
+global proc    string fullPath2ProjPath_Proc_PM (string $texPath) {
+  string $texLocation = `textFieldGrp -q -text   texFolderName_Tf_TM`;  // get the texture location given by the user, default sourceimages
+  return $texLocation + "/" + getTexFileName_Proc_TM( $texPath );
+}  // end proc  <fullPath2ProjPath_Proc_PM>
+
+
+
+
+global  proc   int checkPathType_Proc_PM (string $texPath) {
+  string $parts[];
+  tokenize   $texPath "/" $parts;
+  if (size( $parts ) > 2)    // this is a full path
+    return 1;  // this is a full path
+  else if (size( $parts ) == 2) {
+    if (`substring $texPath 2 2` == ":")   // so this is a full local path
+      return 1;  // this is a full path
+    else if (`substring $texPath 1 2` == "//")   // so this is a full network path
+      return 1;  // this is a full path
+    else
+      return 2;   // this is a project path
+  } // end else if
+  else {
+    string $log = "error -- the texture path, " + $texPath + "  is not correct";        // log
+    textScrollList -e -append  $log   log_Txt_TM;                  //  write log
+  }
+}  //  end proc  <checkPathType_Proc_PM>
+  
+      
+  
+  
+
+global proc string   getTexFileName_Proc_TM (string $texPath) {  //  this proc gets a path and gives the name part of the path
+
+  string $parts[];
+  tokenize $texPath "/" $parts;
+  return $parts[size( $parts ) - 1];
+
+} //  end proc  getTexFileName_Proc_TM
+
+
+
+global proc   string  getProjPartName_Proc_TM (string $currentTexPath) {
+
+  string $parts[];
+  tokenize   $currentTexPath "/" $parts;
+
+  string $texLocation = `textFieldGrp -q -text  texFolderName_Tf_TM`;
+  string $projPath = $texLocation + "/" + $parts[size( $parts ) - 1];
+
+  return $projPath;
+
+}
+
+GUI_PM()

@@ -1,0 +1,689 @@
+global string $hs_defaultAttr = "translate";
+
+if (`window -exists   hs_utils_win`)
+  deleteUI   hs_utils_win;
+window -t "Utils"    hs_utils_win;
+
+//scrollLayout;
+ columnLayout -adj 1;
+
+ frameLayout  -l "Utils" -cll 1 -cl 1;
+
+  frameLayout  -l "Fisrt Node";
+    textFieldButtonGrp -l "First Node" -bl "set"  -adj 1 -cal 1 left  -bc "hs_setFirstNode"        hs_firstNode_tfbg;
+    textFieldGrp -l "Attribute"  -text $hs_defaultAttr  -adj 1  -cal 1 left   hs_firstNodeAttrs_tfg;
+    floatFieldGrp -l "Value"  -adj 1 -cal 1 left   hs_firstNodeValue_ffg;
+  setParent..;
+  
+  
+  frameLayout  -l "Second Node";
+    textFieldButtonGrp -l "Second Node" -bl "set"   -adj 1 -cal 1 left  -bc "hs_setSecondNode"      hs_secondNode_tfbg;
+    textFieldGrp -l "Attribute"  -text $hs_defaultAttr    -adj 1  -cal 1 left  hs_secondNodeAttrs_tfg;
+    floatFieldGrp -l "Value"  -adj 1 -cal 1 left   hs_secondNodeValue_ffg;
+  setParent..;
+
+  
+  frameLayout  -l "Generate";
+    textFieldButtonGrp -l "Generated Node Name"  -bl "Select It"  -bc  "select -r `textFieldButtonGrp -q -text hs_generatedNodeName_tfbg`;"  -adj 1 -cal 1 left  hs_generatedNodeName_tfbg;
+    separator -h 20;
+    button -l "Connect"   -c  "hs_doIt_func(0)";
+    button -l "Distance"   -c  "hs_doIt_func(1)";  
+    button -l "Normalize"   -c  "hs_doIt_func(2)";  
+    button -l "Blend"   -c  "hs_doIt_func(3)";  
+    button -l "Set Driven Key"   -c  "hs_doIt_func(4)";  
+  setParent..;
+  
+ setParent..;
+ 
+ 
+ 
+ frameLayout  -l  "IK SS"   -cll 1 -cl 1;
+   textFieldButtonGrp -l "base Joint"   -bl "Set"   -bc "string $ls[] = `ls -sl -typ joint`; textFieldButtonGrp -e -text $ls[0]  hs_baseJointSs_tfbg;"   -adj 1 -cal 1 left      hs_baseJointSs_tfbg;
+   textFieldButtonGrp -l "end Joint"   -bl "Set"   -bc "string $ls[] = `ls -sl -typ joint`; textFieldButtonGrp -e -text $ls[0]  hs_endJointSs_tfbg;"   -adj 1 -cal 1 left      hs_endJointSs_tfbg;
+   textFieldButtonGrp -l "Lock Point"   -bl "Set"   -bc "string $ls[] = `ls -sl`; textFieldButtonGrp -e -text $ls[0]  hs_lockPointSs_tfbg;"   -adj 1 -cal 1 left      hs_lockPointSs_tfbg;
+   button -l "Set IK SS"   -c "hs_setIkSs_func";
+ setParent..;
+
+ frameLayout  -l  "Multi Constraint"   -cll 1 -cl 1;
+   textFieldButtonGrp  -l "Parents"  -bl "Set"   -bc "hs_setParentsMultiCnstrnt_func"  -adj 1 -cal 1 left     hs_setParentsMultiCnstrnt_tfbg;
+   textFieldButtonGrp  -l "Child"  -bl "Set"   -bc "string $ls[] = `ls -sl`; textFieldButtonGrp -e -text $ls[0] hs_setChildMultiCnstrnt_tfbg;"  -adj 1 -cal 1 left     hs_setChildMultiCnstrnt_tfbg;   
+   textFieldButtonGrp  -l "Controller"  -bl "Set"   -bc "string $ls[] = `ls -sl`; textFieldButtonGrp -e -text $ls[0] hs_setCntrlMultiCnstrnt_tfbg;"  -adj 1 -cal 1 left     hs_setCntrlMultiCnstrnt_tfbg;   
+   radioButtonGrp -l "Type"  -numberOfRadioButtons 4   -labelArray4  "Point" "Orient" "Scale" "parent" -adj 1 -cal 1 left      hs_typeMultiCnstrnt_rbg;
+   button -l "Set Multi Constratint"   -c "hs_setMultiCnstrnt_func";
+ setParent..;
+
+ frameLayout  -l  "Add Shape"   -cll 1 -cl 1;
+   textFieldButtonGrp  -l "Objects"  -bl "Set"   -bc "hs_setObjectsAddShape_func"  -adj 1 -cal 1 left     hs_setObjectsAddShape_tfbg;
+   textFieldButtonGrp  -l "Shape"  -bl "Set"   -bc "string $ls[] = `ls -sl`; textFieldButtonGrp -e -text $ls[0] hs_setShapeAddShape_tfbg;"  -adj 1 -cal 1 left     hs_setShapeAddShape_tfbg;   
+   button -l "Add Shape"   -c "hs_addShape_func";
+ setParent..;
+
+ frameLayout  -l  "Multi Blend"   -cll 1 -cl 1;
+   textFieldButtonGrp  -l "Sources 1"  -bl "Set"   -bc "hs_setObjects1MultiBlend_func"  -adj 1 -cal 1 left     hs_setObjects1MultiBlend_tfbg;
+   textFieldGrp  -l "Attribute 1"  -adj 1 -cal 1 left     hs_setAttr1MultiBlend_tfbg;
+   textFieldButtonGrp  -l "Sources 2"  -bl "Set"   -bc "hs_setObjects2MultiBlend_func"  -adj 1 -cal 1 left     hs_setObjects2MultiBlend_tfbg;
+   textFieldGrp  -l "Attribute 2"  -adj 1 -cal 1 left     hs_setAttr2MultiBlend_tfbg;
+   textFieldButtonGrp  -l "Targets"  -bl "Set"   -bc "hs_setTargetsMultiBlend_func"  -adj 1 -cal 1 left     hs_setTargetsMultiBlend_tfbg;
+   textFieldGrp  -l "Targets Attribute"  -adj 1 -cal 1 left     hs_setTargetAttrMultiBlend_tfbg;
+   textFieldGrp  -l "Blends"  -adj 1 -cal 1 left     hs_setBlendsMultiBlend_tfbg;
+   button -l "Set Multi Blend"   -c "hs_setMultiBlend_func";
+ setParent..;
+
+
+ frameLayout  -l  "Multi Connect"   -cll 1 -cl 1;
+   textFieldButtonGrp  -l "Sources 1"  -bl "Set"   -bc "hs_setObjects1MultiConnect_func"  -adj 1 -cal 1 left     hs_setObjects1MultiConnect_tfbg;
+   textFieldGrp  -l "Attribute 1"  -adj 1 -cal 1 left     hs_setAttr1MultiConnect_tfbg;
+   textFieldButtonGrp  -l "Sources 2"  -bl "Set"   -bc "hs_setObjects2MultiConnect_func"  -adj 1 -cal 1 left     hs_setObjects2MultiConnect_tfbg;
+   textFieldGrp  -l "Attribute 2"  -adj 1 -cal 1 left     hs_setAttr2MultiConnect_tfbg;
+   button -l "Set Multi Connect"   -c "hs_setMultiConnect_func";
+ setParent..;
+
+setParent..;  // columnLayout
+//setParent..; // scrollLayout
+
+showWindow  hs_utils_win;
+
+
+// Multi Connect //
+
+proc hs_setMultiConnect_func() {
+  string $objsStr;
+  $objsStr = `textFieldButtonGrp  -q  -text   hs_setObjects1MultiConnect_tfbg`;
+  if ($objsStr == "")
+    error( "no sourcess 1 set\n" );
+  string $objects1[];
+  tokenize  $objsStr   $objects1;
+
+  string $attr1 = `textFieldGrp -q -text     hs_setAttr1MultiConnect_tfbg`;
+  if ($attr1 == "")
+    error( "no attribute 1 set\n" );
+
+  $objsStr = `textFieldButtonGrp  -q  -text   hs_setObjects2MultiConnect_tfbg`;
+  if ($objsStr == "")
+    error( "no sources 2 set\n" );
+  string $objects2[];
+  tokenize  $objsStr   $objects2;
+
+  string $attr2 = `textFieldGrp -q -text     hs_setAttr2MultiConnect_tfbg`;
+  if ($attr2 == "")
+    error( "no attribute 2 set\n" );
+
+  int $i;
+  if (size( $objects1 ) == 1)
+    for ($i = 0 ; $i < size( $objects2 ) ; ++$i)
+      hs_connect_func( $objects1[0], $attr1, $objects2[$i], $attr2 );
+  else
+    if (size( $objects1 ) == size( $objects2 ))
+      for ($i = 0 ; $i < size( $objects1 ) ; ++$i)
+        hs_connect_func( $objects1[$i], $attr1, $objects2[$i], $attr2 );
+    else
+      error( "wrong number of selection set\n" );
+      
+      
+}
+
+
+proc  hs_setObjects1MultiConnect_func() {
+  string $objsList[] = `ls -sl`;
+  string $objsStr = "";
+  int $i;
+  for ($i = 0 ; $i < size( $objsList ) ; ++$i)
+    $objsStr = $objsStr + $objsList[$i] + " ";
+  textFieldButtonGrp  -e -text $objsStr    hs_setObjects1MultiConnect_tfbg;
+}
+
+
+proc  hs_setObjects2MultiConnect_func() {
+  string $objsList[] = `ls -sl`;
+  string $objsStr = "";
+  int $i;
+  for ($i = 0 ; $i < size( $objsList ) ; ++$i)
+    $objsStr = $objsStr + $objsList[$i] + " ";
+  textFieldButtonGrp  -e -text $objsStr    hs_setObjects2MultiConnect_tfbg;
+}
+
+
+//---------------------------------------------------------------------------
+
+
+// Multi Blend //
+proc  hs_setTargetsMultiBlend_func() {
+  string $objsList[] = `ls -sl`;
+  string $objsStr = "";
+  int $i;
+  for ($i = 0 ; $i < size( $objsList ) ; ++$i)
+    $objsStr = $objsStr + $objsList[$i] + " ";
+  textFieldButtonGrp  -e -text $objsStr    hs_setTargetsMultiBlend_tfbg;
+}
+
+
+proc  hs_setObjects1MultiBlend_func() {
+  string $objsList[] = `ls -sl`;
+  string $objsStr = "";
+  int $i;
+  for ($i = 0 ; $i < size( $objsList ) ; ++$i)
+    $objsStr = $objsStr + $objsList[$i] + " ";
+  textFieldButtonGrp  -e -text $objsStr    hs_setObjects1MultiBlend_tfbg;
+}
+
+
+proc  hs_setObjects2MultiBlend_func() {
+  string $objsList[] = `ls -sl`;
+  string $objsStr = "";
+  int $i;
+  for ($i = 0 ; $i < size( $objsList ) ; ++$i)
+    $objsStr = $objsStr + $objsList[$i] + " ";
+  textFieldButtonGrp  -e -text $objsStr    hs_setObjects2MultiBlend_tfbg;
+}
+
+
+proc   hs_setMultiBlend_func() {
+  string $objsStr;
+  $objsStr = `textFieldButtonGrp  -q  -text   hs_setObjects1MultiBlend_tfbg`;
+  if ($objsStr == "")
+    error( "no Objects set\n" );
+  string $objects1[];
+  tokenize  $objsStr   $objects1;
+
+  string $attr1 = `textFieldGrp -q -text     hs_setAttr1MultiBlend_tfbg`;
+  if ($attr1 == "")
+    error( "no attribute 1 set\n" );
+  
+  $objsStr = `textFieldButtonGrp  -q  -text   hs_setObjects2MultiBlend_tfbg`;
+  if ($objsStr == "")
+    error( "no Objects set\n" );
+  string $objects2[];
+  tokenize  $objsStr   $objects2;
+
+  string $attr2 = `textFieldGrp -q -text     hs_setAttr2MultiBlend_tfbg`;
+  if ($attr2 == "")
+    error( "no attribute 2 set\n" );
+  
+  if ( size( $objects1 ) != size( $objects2 ) )
+    error( "wrong objects count set\n" );
+
+  $objsStr = `textFieldButtonGrp  -q  -text   hs_setTargetsMultiBlend_tfbg`;
+  if ($objsStr == "")
+    error( "no targets set\n" );
+  string $targets[];
+  tokenize  $objsStr   $targets;
+
+  string $targetAttr = `textFieldGrp -q -text     hs_setTargetAttrMultiBlend_tfbg`;
+  if ($targetAttr == "")
+    error( "no target attribute set\n" );
+
+  if ( size( $targets ) != size( $objects1 ) )
+    error( "wrong targets count set\n" );
+    
+  string $blendsStr = "";
+  int $i;
+  for ($i = 0 ; $i < size( $objects1 ) ; ++$i) {
+    string $blend = hs_blend_func( $objects1[$i], $attr1, $objects2[$i], $attr2, "" );
+    connectAttr -f   ($blend + ".output") ($targets[$i] + "." + $targetAttr);
+    $blendsStr = $blendsStr + $blend + " ";
+  }
+  textFieldGrp -e  -text  $blendsStr hs_setBlendsMultiBlend_tfbg;
+  
+}
+//----------------------------------------------------------------------------
+
+
+
+// Add Shape //
+proc hs_setObjectsAddShape_func() {
+  string $objsList[] = `ls -sl`;
+  string $objsStr = "";
+  int $i;
+  for ($i = 0 ; $i < size( $objsList ) ; ++$i)
+    $objsStr = $objsStr + $objsList[$i] + " ";
+  textFieldButtonGrp  -e -text $objsStr    hs_setObjectsAddShape_tfbg;
+}  
+  
+  
+proc  hs_addShape_func() {
+  string $objsStr = `textFieldButtonGrp  -q  -text   hs_setObjectsAddShape_tfbg`;
+  if ($objsStr == "")
+    error( "no Objects set\n" );
+  string $objects[];
+  tokenize  $objsStr   $objects;
+  string $shape = `textFieldButtonGrp  -q  -text   hs_setShapeAddShape_tfbg`;
+  if ($shape == "")
+    error( "no shape set\n" );
+  int $i;
+  for ($i = 0 ; $i < size( $objects ) ; ++$i)
+    parent -add -shape   $shape     $objects[$i];
+}
+//----------------------------------------------------------------------------
+
+
+// Multi Constraint //
+proc   hs_setMultiCnstrnt_func() {
+  string $parentsStr = `textFieldButtonGrp  -q  -text   hs_setParentsMultiCnstrnt_tfbg`;
+  if ($parentsStr == "")
+    error( "no parents set\n" );
+  string $parents[];
+  tokenize $parentsStr $parents;
+  string $child = `textFieldButtonGrp  -q  -text   hs_setChildMultiCnstrnt_tfbg`;
+  if ($child == "")
+    error( "no child set\n" );
+  string $controller = `textFieldButtonGrp  -q  -text   hs_setCntrlMultiCnstrnt_tfbg`;
+  if ($controller == "")
+    error( "no controller set\n" );
+  int $type = `radioButtonGrp  -q  -select    hs_typeMultiCnstrnt_rbg`;
+  if ($type == 0)
+    error( "no type set\n" );
+    
+  int $i, $j, $k;
+  string $cnstrnt;
+  switch ($type) {
+  
+    case 1:  // point
+      string $cnstrntL[] = `pointConstraint -mo -weight 1   $parents[0]   $child`;
+      $cnstrnt =   $cnstrntL[0];
+      string $enum = $parents[0] + ":";
+      for ($i = 1 ; $i < size( $parents ) ; $i++) {
+        pointConstraint -mo -weight 1    $parents[$i]    $child;
+        $enum = $enum + $parents[$i] + ":";
+      }
+      addAttr -ln "switchCntrl_point"  -at "enum" -en $enum     $controller;
+      setAttr -e -keyable true ($controller + ".switchCntrl_point");
+      for ($k = 0 ; $k < size( $parents ) ; ++$k)
+        for ($j = 0 ; $j < size( $parents ) ; ++$j) {
+          if ($parents[$k] == $parents[$j])
+            hs_setDrivenKey_func( $controller, "switchCntrl_point", $j, $cnstrnt, ($parents[$k] + "W" + $k), 1 );
+          else
+            hs_setDrivenKey_func( $controller, "switchCntrl_point", $j, $cnstrnt, ($parents[$k] + "W" + $k), 0 );
+        }          
+    break;
+  
+    case 2:  // orient
+      string $cnstrntL[] = `orientConstraint -mo -weight 1   $parents[0]   $child`;
+      $cnstrnt =   $cnstrntL[0];
+      string $enum = $parents[0] + ":";
+      for ($i = 1 ; $i < size( $parents ) ; $i++) {
+        orientConstraint -mo -weight 1    $parents[$i]    $child;
+        $enum = $enum + $parents[$i] + ":";
+      }
+      addAttr -ln "switchCntrl_orient"  -at "enum" -en $enum     $controller;
+      setAttr -e -keyable true ($controller + ".switchCntrl_orient");
+      for ($k = 0 ; $k < size( $parents ) ; ++$k)
+        for ($j = 0 ; $j < size( $parents ) ; ++$j) {
+          if ($parents[$k] == $parents[$j])
+            hs_setDrivenKey_func( $controller, "switchCntrl_orient", $j, $cnstrnt, ($parents[$k] + "W" + $k), 1 );
+          else
+            hs_setDrivenKey_func( $controller, "switchCntrl_orient", $j, $cnstrnt, ($parents[$k] + "W" + $k), 0 );
+        }  
+    break;
+  
+    case 3:  // scale
+      string $cnstrntL[] = `scaleConstraint -mo -weight 1   $parents[0]   $child`;
+      $cnstrnt =   $cnstrntL[0];
+      string $enum = $parents[0] + ":";
+      for ($i = 1 ; $i < size( $parents ) ; $i++) {
+        scaleConstraint -mo -weight 1    $parents[$i]    $child;
+        $enum = $enum + $parents[$i] + ":";
+      }
+      addAttr -ln "switchCntrl_scale"  -at "enum" -en $enum     $controller;
+      setAttr -e -keyable true ($controller + ".switchCntrl_scale");
+      for ($k = 0 ; $k < size( $parents ) ; ++$k)
+        for ($j = 0 ; $j < size( $parents ) ; ++$j) {
+          if ($parents[$k] == $parents[$j])
+            hs_setDrivenKey_func( $controller, "switchCntrl_scale", $j, $cnstrnt, ($parents[$k] + "W" + $k), 1 );
+          else
+            hs_setDrivenKey_func( $controller, "switchCntrl_scale", $j, $cnstrnt, ($parents[$k] + "W" + $k), 0 );
+        }  
+    break;
+
+    case 4:  // scale
+      string $cnstrntL[] = `parentConstraint -mo -weight 1   $parents[0]   $child`;
+      $cnstrnt =   $cnstrntL[0];
+      string $enum = $parents[0] + ":";
+      for ($i = 1 ; $i < size( $parents ) ; $i++) {
+        parentConstraint -mo -weight 1    $parents[$i]    $child;
+        $enum = $enum + $parents[$i] + ":";
+      }
+      addAttr -ln "switchCntrl_parent"  -at "enum" -en $enum     $controller;
+      setAttr -e -keyable true ($controller + ".switchCntrl_parent");
+      for ($k = 0 ; $k < size( $parents ) ; ++$k)
+        for ($j = 0 ; $j < size( $parents ) ; ++$j) {
+          if ($parents[$k] == $parents[$j])
+            hs_setDrivenKey_func( $controller, "switchCntrl_parent", $j, $cnstrnt, ($parents[$k] + "W" + $k), 1 );
+          else
+            hs_setDrivenKey_func( $controller, "switchCntrl_parent", $j, $cnstrnt, ($parents[$k] + "W" + $k), 0 );
+        }  
+    break;
+
+  }  // end switch
+  
+
+}  // end func
+
+
+
+proc   hs_setParentsMultiCnstrnt_func()  {
+  string $parentsList[] = `ls -sl`;
+  string $parentsStr = "";
+  for ($i = 0 ; $i < size( $parentsList ) ; ++$i)
+    $parentsStr = $parentsStr + $parentsList[$i] + " ";
+  textFieldButtonGrp  -e -text $parentsStr    hs_setParentsMultiCnstrnt_tfbg;
+}
+//----------------------------------------------------------------------------
+
+
+// IK SS //
+proc  hs_setIkSs_func() {
+
+  string $baseJoint = `textFieldButtonGrp  -q  -text    hs_baseJointSs_tfbg`;
+  string $endJoint = `textFieldButtonGrp  -q  -text    hs_endJointSs_tfbg`;
+  string $lockPoint = `textFieldButtonGrp  -q  -text    hs_lockPointSs_tfbg`;
+
+  string $jList[] = `ls -typ joint -ap -dag  $baseJoint`;
+  print( size( $jList) );
+  string $chainList[];
+  int $i = 0;
+  do {
+    $chainList[$i] = $jList[$i];
+  }    while ( $jList[$i++] != $endJoint );  
+  string $midJoint = $chainList[1];
+  
+  string $basePoint = `group -em -n ($baseJoint + "_basePnt_Grp")`;
+  float $basePos[3] = `xform -q -ws -t   $baseJoint`;
+  xform -ws  -t   ($basePos[0]) ($basePos[1]) ($basePos[2])      $basePoint;
+
+  string $endPoint = `group -em -n ($endJoint + "_endPnt_Grp")`;
+  float $endPos[3] = `xform -q -ws -t   $endJoint`;
+  xform -ws  -t   ($endPos[0]) ($endPos[1]) ($endPos[2])      $endPoint;
+
+  // makes the chain distance node
+  string $chainDistance = hs_distance_func ($basePoint, "translate", $endPoint, "translate", "");
+  
+  // measures the chain length
+  float $chainLength = 0;
+  float $upperLen = `getAttr ($midJoint + ".tx" )`;
+  float $lowerLen = `getAttr ($endJoint + ".tx" )`;
+  $chainLength = $upperLen + $lowerLen;
+  
+  //  sets the driven keys
+  string $upperBlend = `createNode blendTwoAttr`; 
+  hs_setDrivenKey_func( $chainDistance, "distance", $chainLength, $upperBlend, "input[0]", $upperLen );
+  hs_setDrivenKey_func( $chainDistance, "distance", $chainLength * 2, $upperBlend, "input[0]", $upperLen * 2 );
+  string $upperDistance = hs_distance_func ($basePoint, "translate", $lockPoint, "translate", "");
+  connectAttr  -f  ($upperDistance + ".distance")  ($upperBlend + ".input[1]");
+  connectAttr  -f  ($upperBlend + ".output") ($midJoint + ".tx");
+
+  string $lowerBlend = `createNode blendTwoAttr`; 
+  hs_setDrivenKey_func( $chainDistance, "distance", $chainLength, $lowerBlend, "input[0]", $lowerLen );
+  hs_setDrivenKey_func( $chainDistance, "distance", $chainLength * 2, $lowerBlend, "input[0]", $lowerLen * 2 );
+  string $lowerDistance = hs_distance_func ($endPoint, "translate", $lockPoint, "translate", "");
+  connectAttr  -f  ($lowerDistance + ".distance")  ($lowerBlend + ".input[1]");
+  connectAttr  -f  ($lowerBlend + ".output") ($endJoint + ".tx");
+
+  
+}
+//----------------------------------------------------------------------------
+
+
+
+
+
+//  Utils //
+proc int   hs_setFirstNode() {
+  global string $hs_defaultAttr;
+  string $ls[] = `ls -sl`;
+  string $lsSelected = $ls[0];
+  textFieldButtonGrp -e -text   $lsSelected     hs_firstNode_tfbg;
+  if ( $lsSelected == "" ) {
+    textFieldGrp -e   -text $hs_defaultAttr     hs_firstNodeAttrs_tfg;
+    warning( "Select one node to be set\n" );
+    return 1;
+  }
+  return 0;
+} 
+
+
+proc int   hs_setSecondNode () {
+  global string $hs_defaultAttr;
+  string $ls[] = `ls -sl`;
+  string $lsSelected = $ls[0];
+  textFieldButtonGrp -e -text   $lsSelected     hs_secondNode_tfbg;
+  if ( $lsSelected == "" ) {
+    textFieldGrp -e   -text $hs_defaultAttr     hs_secondNodeAttrs_tfg;
+    warning( "Select one node to be set\n" );
+    return 1;
+  }
+  return 0;
+} 
+
+
+proc   hs_doIt_func (int $type) {
+  string $node1 = `textFieldButtonGrp  -q -text    hs_firstNode_tfbg`;
+  string $attr1 = `textFieldGrp -q -text    hs_firstNodeAttrs_tfg`;
+  float $value1 = `floatFieldGrp -q -v1   hs_firstNodeValue_ffg`;
+
+  string $node2 = `textFieldButtonGrp  -q -text    hs_secondNode_tfbg`;
+  string $attr2 = `textFieldGrp -q -text    hs_secondNodeAttrs_tfg`;
+  float $value2 = `floatFieldGrp -q -v1   hs_secondNodeValue_ffg`;
+  
+  string $generatedNode = `textFieldButtonGrp -q -text    hs_generatedNodeName_tfbg`;
+  if (`objExists $generatedNode`)
+    error( "generated node already existed\n" );
+
+
+  switch ($type) {
+  case 0:
+      hs_connect_func( $node1, $attr1, $node2, $attr2 );
+  break;
+  case 1:
+      hs_distance_func( $node1, $attr1, $node2, $attr2, $generatedNode );
+  break;
+  case 2:
+      hs_normalize_func( $node1, $attr1, $value1, $node2, $attr2, $value2, $generatedNode );
+  break;
+  case 3:
+      hs_blend_func( $node1, $attr1, $node2, $attr2, $generatedNode );
+  break;
+  case 4:
+      hs_setDrivenKey_func( $node1, $attr1, $value1, $node2, $attr2, $value2 );
+  break;
+  }
+
+}
+
+
+
+proc  int   hs_connect_func (string $node1, string $attr1, string $node2, string $attr2) {
+  connectAttr -f ($node1 + "." + $attr1) ($node2 + "." + $attr2);
+  return 0;
+}
+
+
+
+
+proc  string   hs_distance_func (string $node1, string $attr1, string $node2, string $attr2, string $gNode) {
+  if ( $gNode != "" )
+      createNode distanceBetween -n   $gNode;
+  else
+      $gNode = `createNode distanceBetween`;
+      
+  connectAttr -f ($node1 + "." + $attr1) ($gNode + ".point1");
+  connectAttr -f ($node2 + "." + $attr2) ($gNode + ".point2");
+  
+  textFieldButtonGrp   -e   -text  $gNode        hs_generatedNodeName_tfbg;
+  select -r   $gNode;
+  
+  return $gNode;
+}
+  
+
+
+
+proc  int   hs_normalize_func (string $node1, string $attr1, float $value1, string $node2, string $attr2, float $value2, string $gNode) {
+  if ( $gNode != "" )
+      createNode multiplyDivide -n   $gNode;
+  else
+      $gNode = `createNode multiplyDivide`;
+      
+  if ( ($node1 != "") && ($node2 == "") ) {
+      string $attrType = `getAttr -typ   ($node1 + "." + $attr1)`;
+      if ( ($attrType == "doubleLinear") || ($attrType == "doubleAngle") || ($attrType == "double") )    {    // scalar
+          connectAttr -f ($node1 + "." + $attr1) ($gNode + ".input1.input1X");
+          setAttr ($gNode + ".input2.input2X") $value2;
+      }    // end inner if
+      else {
+          connectAttr -f ($node1 + "." + $attr1) ($gNode + ".input1");
+          setAttr ($gNode + ".input2") $value2 $value2 $value2;
+      }   // end inner else
+  }  // end outer if          
+
+  else if ( ($node1 == "") && ($node2 != "") ) {
+      string $attrType = `getAttr -typ   ($node2 + "." + $attr2)`;
+      if ( ($attrType == "doubleLinear") || ($attrType == "doubleAngle") || ($attrType == "double") )    {    // scalar
+          connectAttr -f ($node2 + "." + $attr2) ($gNode + ".input2.input2X");
+          setAttr ($gNode + ".input1.input1X") $value1;
+      }    // end inner if
+      else {
+          connectAttr -f ($node2 + "." + $attr2) ($gNode + ".input2");
+          setAttr ($gNode + ".input1") $value1 $value1 $value1;
+      }   // end inner else
+  }  // end outer if          
+
+  else if ( ($node1 != "") && ($node2 != "") ) {
+      string $attrType = `getAttr -typ   ($node1 + "." + $attr1)`;
+      if ( ($attrType == "doubleLinear") || ($attrType == "doubleAngle") || ($attrType == "double") )    {    // scalar
+          connectAttr -f ($node1 + "." + $attr1) ($gNode + ".input1.input1X");
+          connectAttr -f ($node2 + "." + $attr2) ($gNode + ".input2.input2X");
+      }    // end inner if
+      else {
+          connectAttr -f ($node1 + "." + $attr1) ($gNode + ".input1");
+          connectAttr -f ($node2 + "." + $attr2) ($gNode + ".input2");
+      }   // end inner else
+  }  // end outer if  
+  
+  else
+      return 1;        
+
+  textFieldButtonGrp   -e   -text  $gNode        hs_generatedNodeName_tfbg;
+  select -r   $gNode;
+
+  return 0;
+}
+  
+  
+  
+  
+  
+proc  string   hs_blend_func (string $node1, string $attr1, string $node2, string $attr2, string $gNode) {
+  if ( ($node1 == "") || ($node2 == "") )
+    error( "incomplete nodes set\n" );
+  if ( ($attr1 == "") || ($attr2 == "") )
+    error( "incomplete attrs set\n" );
+  
+  string $attr1Type = `getAttr -typ   ($node1 + "." + $attr1)`;
+  if ( ($attr1Type == "doubleLinear") || ($attr1Type == "doubleAngle") || ($attr1Type == "double") )
+    $attr1Type = "double";
+  else if ($attr1Type == "double3")
+    $attr1Type = "double3";
+
+  string $attr2Type = `getAttr -typ   ($node2 + "." + $attr2)`;
+  if ( ($attr2Type == "doubleLinear") || ($attr2Type == "doubleAngle") || ($attr2Type == "double") )
+    $attr2Type = "double";
+  else if ($attr2Type == "double3")
+    $attr2Type = "double3";
+
+  if ($attr1Type != $attr2Type)
+    error( "attrs types inconsistent\n" );
+  
+  switch ($attr1Type) {
+  case "double":
+  if ( $gNode != "" )
+      createNode blendTwoAttr -n   $gNode;
+  else
+      $gNode = `createNode blendTwoAttr`;
+
+  string $attrType;
+  if ( ($node1 != "") && ($node2 != "") ) {
+      $attrType = `getAttr -typ   ($node1 + "." + $attr1)`;
+      if ( ($attrType == "doubleLinear") || ($attrType == "doubleAngle") || ($attrType == "double") )
+          connectAttr -f ($node1 + "." + $attr1) ($gNode + ".input[0]");
+      else
+          error( "wrong attribute1 type set\n" );
+          
+      $attrType = `getAttr -typ   ($node2 + "." + $attr2)`;
+      
+      if ( ($attrType == "doubleLinear") || ($attrType == "doubleAngle") || ($attrType == "double") )
+          connectAttr -f ($node2 + "." + $attr2) ($gNode + ".input[1]");
+      else
+          error( "wrong attribute2 type set\n" );
+  } // end outer if
+  else
+      error( "incomplete attributes set\n" );
+    
+  break;
+ 
+  case "double3":
+  if ( $gNode != "" )
+      createNode blendColors -n   $gNode;
+  else
+      $gNode = `createNode blendColors`;
+
+  string $attrType;
+  if ( ($node1 != "") && ($node2 != "") ) {
+      $attrType = `getAttr -typ   ($node1 + "." + $attr1)`;
+      if ( $attrType == "double3" )
+          connectAttr -f ($node1 + "." + $attr1) ($gNode + ".color1");
+      else
+          error( "wrong attribute1 type set\n" );
+          
+      $attrType = `getAttr -typ   ($node2 + "." + $attr2)`;
+      if ( $attrType == "double3" )
+          connectAttr -f ($node2 + "." + $attr2) ($gNode + ".color2");
+      else
+          error( "wrong attribute2 type set\n" );
+  } // end outer if
+  else
+      error( "incomplete attributes set\n" );
+  break;
+  
+ } // end switch
+  
+  textFieldButtonGrp   -e   -text  $gNode        hs_generatedNodeName_tfbg;
+  select -r   $gNode;
+  return $gNode;
+
+}
+
+
+
+  
+proc  int   hs_setDrivenKey_func (string $driver, string $attr1, float $value1, string $driven, string $attr2, float $value2) {
+
+//  if (   ($driver != "") && ($driven != "")   ) {
+//      string $attrType1 = `getAttr -typ   ($driver + "." + $attr1)`;
+//      string $attrType2 = `getAttr -typ   ($driven + "." + $attr2)`;
+//      if (   (($attrType1 == "doubleLinear") || ($attrType1 == "doubleAngle") || ($attrType1 == "double") || ($attrType1 == "enum"))   && 
+//             (($attrType2 == "doubleLinear") || ($attrType2 == "doubleAngle") || ($attrType2 == "double") || ($attrType1 == "enum"))        )  {
+          setDrivenKeyframe  -cd ($driver + "." + $attr1)   -dv $value1   -at $attr2   -v $value2     -itt "linear"  -ott "linear"     $driven;
+//      }  //end inner if
+//      else {
+//          error( "wrong attribute type set\n" );
+//          return 1;
+//      }
+//  } // end outer if
+//  else {
+//      error( "incomplete attributes set\n" );
+//      return 1;
+//  }
+    
+  textFieldButtonGrp   -e   -text  "set.."        hs_generatedNodeName_tfbg;
+
+  return 0;
+}
+  
+//----------------------------------------------------------------------------
+
+  
+  
+  
+  
+  
+  

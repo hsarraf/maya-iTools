@@ -1,0 +1,547 @@
+//////////////////////////////////////////////////////
+////////// COPYRIGHT (C) 2012 HADI SARRAF ////////////
+//////////// Written by : Hadi Sarraf ////////////////
+////////////// Date : July 29, 2012 //////////////////
+////////////// Update : August 17, 2012 (*)///////////
+///// Exclusive usage for TURQUOISE GUARD Animation //
+/////////// Characters configurations: ///////////////
+//////////////////////////// IkFk : Ik / Fk///////////
+//////////////////////////// Stretchy : On / Off//////
+//////////////////////////// Switch : Lock / Free ////
+//////////////////////////// Selection Tools /////////
+//////////////////////////// *Face Rig Handlers //////
+//////////////////////////////////////////////////////
+
+
+
+// Global Vars
+
+// namespace
+global string $hs_nameSpace_ToraGuard = "";
+
+// labels
+//global string $hs_IkFkLabel = "IkFk";
+//global string $hs_stretchyLabel = "strch";
+//global string $hs_switchLabel = "swch";
+global string $hs_IkFkLabel = "";
+global string $hs_stretchyLabel = "";
+global string $hs_switchLabel = "";
+
+float $emptyCol = .8;
+
+if (`window -exists   hs_charsControlWin_win`)
+  deleteUI   hs_charsControlWin_win;
+
+  
+window  -t "Turquoise Guad Characters Control"   -s 0    hs_charsControlWin_win;
+rowLayout   -nc 3  -adj 1;
+  
+  columnLayout  -adj 1;
+   radioCollection  hs_whichChar_rc;
+    radioButton -l "Akooman"   -onc "hs_setCurrentConfig_func(\"Ak\")"    Ak;
+    radioButton -l "Bahman"   -onc "hs_setCurrentConfig_func(\"Ba\")"     Ba;
+    radioButton -l "Indira"   -onc "hs_setCurrentConfig_func(\"In\")"     In;
+    radioButton -l "Savool"   -onc "hs_setCurrentConfig_func(\"Sa\")"     Sa;
+    radioButton -l "Shahriv"   -onc "hs_setCurrentConfig_func(\"Sh\")"    Sh;
+    radioButton -l "Ordib"   -onc "hs_setCurrentConfig_func(\"Or\")"      Or;
+    radioButton -l "Behrokh"   -onc "hs_setCurrentConfig_func(\"Be\")"    Be;
+    radioButton -l "Poolad"   -onc "hs_setCurrentConfig_func(\"Po\")"     Po;
+    radioButton -l "Pooran"    -onc "hs_setCurrentConfig_func(\"Pr\")"    Pr;
+    radioButton -l "Pirooz"    -onc "hs_setCurrentConfig_func(\"Pz\")"    Pz;
+    radioButton -l "Mojneshin"   -onc "hs_setCurrentConfig_func(\"Mj\")"  Mj;
+    radioButton -l "OldMan"   -onc "hs_setCurrentConfig_func(\"Om\")"     Om;        
+    radioButton -l "Guard"   -onc "hs_setCurrentConfig_func(\"Gu\")"      Gu; 
+  setParent..;      
+  
+    
+  gridLayout  -nr 7  -nc  5    -cellWidthHeight 36 36;
+
+    button  -l "set" -bgc .9 .9 .9 -c "hs_setCurrentConfig_func(\"\")";           button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;            button -l $hs_stretchyLabel -bgc .8 .8 .4 -c "hs_config_func(\"h1\")" h1;       iconTextButton -i "head.bmp" -c "hs_selectIt_func(\"h\")";           button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;
+
+    button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;           button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;            button -l $hs_switchLabel -bgc .8 .8 .4 -c "hs_config_func(\"h2\")" h2;        iconTextButton  -i "arrow.bmp" -c "hs_selectIt_func(\"ub\")";           button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;
+
+    button -l $hs_IkFkLabel -bgc .6 .7 .5 -c "hs_config_func(\"ra1\")" ra1;     button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;            button -l $hs_stretchyLabel -bgc 1 .7 .4 -c "hs_config_func(\"b1\")" b1;        button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;           button -l $hs_IkFkLabel -bgc .6 .7 .5 -c "hs_config_func(\"la1\")" la1;
+
+    button -l $hs_stretchyLabel -bgc .6 .7 .5 -c "hs_config_func(\"ra2\")" ra2;      iconTextButton  -i "circle.bmp" -c "hs_selectIt_func(\"p\")";            button -l $hs_switchLabel -bgc 1 .7 .4 -c "hs_config_func(\"b2\")" b2;        iconTextButton  -i "arrow.bmp" -c "hs_selectIt_func(\"lb\")";           button -l $hs_stretchyLabel -bgc .6 .7 .5 -c "hs_config_func(\"la2\")" la2;
+
+    button -l $hs_switchLabel -bgc .6 .7 .5 -c "hs_config_func(\"ra3\")" ra3;      button -l $hs_IkFkLabel -bgc .6 .7 1 -c "hs_config_func(\"rl1\")" rl1;       iconTextButton  -i "circle.bmp" -c "hs_selectIt_func(\"mb\")";           button -l $hs_IkFkLabel -bgc .6 .7 1 -c "hs_config_func(\"ll1\")" ll1;      button -l $hs_switchLabel -bgc .6 .7 .5 -c "hs_config_func(\"la3\")" la3;
+
+    iconTextButton  -i "RHand.bmp" -c "hs_selectIt_func(\"rh\")"  rh;           button -l $hs_stretchyLabel -bgc .6 .7 1 -c "hs_config_func(\"rl2\")" rl2;        iconTextButton  -i "circle.bmp" -c "hs_selectIt_func(\"r\")";           button -l $hs_stretchyLabel -bgc .6 .7 1 -c "hs_config_func(\"ll2\")" ll2;       iconTextButton  -i "LHand.bmp" -c "hs_selectIt_func(\"lh\")"  lh;
+
+    iconTextButton  -i "RFoot.bmp" -c "hs_selectIt_func(\"rf\")"  rf;           button -l $hs_switchLabel -bgc .6 .7 1 -c "hs_config_func(\"rl3\")" rl3;        button  -l "" -bgc $emptyCol $emptyCol $emptyCol -en 0;           button -l $hs_switchLabel -bgc .6 .7 1 -c "hs_config_func(\"ll3\")" ll3;       iconTextButton  -i "LFoot.bmp" -c "hs_selectIt_func(\"lf\")"  lf;
+  setParent..;      
+  
+  paneLayout   -w 280  -h 250    hs_faceCamPane_pl;
+  setParent..;      
+       
+showWindow         hs_charsControlWin_win;
+
+
+
+global proc    hs_selectIt_func (string $what) {
+  global string $hs_nameSpace_ToraGuard;
+  string $charSuffix = `radioCollection   -q -select   hs_whichChar_rc`;
+  switch ($what) {
+    case "h":
+      select ($hs_nameSpace_ToraGuard + ":M_neck_" + $charSuffix);
+    break;
+    case "ub":
+      select ($hs_nameSpace_ToraGuard + ":M_backEnd_" + $charSuffix);
+    break;
+    case "lb":
+      select ($hs_nameSpace_ToraGuard + ":M_backBase_" + $charSuffix);
+    break;
+    case "p":
+      select ($hs_nameSpace_ToraGuard + ":M_pelvis_" + $charSuffix);
+    break;
+    case "lh":
+      select ($hs_nameSpace_ToraGuard + ":L_hand_" + $charSuffix);
+    break;
+    case "lf":
+      select ($hs_nameSpace_ToraGuard + ":L_foot_" + $charSuffix);
+    break;
+    case "rh":
+      select ($hs_nameSpace_ToraGuard + ":R_hand_" + $charSuffix);
+    break;
+    case "rf":
+      select ($hs_nameSpace_ToraGuard + ":R_foot_" + $charSuffix);
+    break;
+    case "mb":
+      select ($hs_nameSpace_ToraGuard + ":M_backMain_" + $charSuffix);
+    break;
+    case "r":
+      select ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix);
+    break;    
+  }
+}
+    
+    
+    
+proc   string  getGuardNamespace()   {
+  string $selection[] = `ls -sl`;
+  //if (size( $selection ) != 1)
+  //  return "Guard_R";
+  string $root = $selection[0];
+  string $buf[];
+  tokenize   $root ":" $buf;
+  if (size( $buf ) != 2)
+    return "Guard_R";
+  return $buf[0];
+}
+  
+
+
+
+global proc     hs_config_func (string $part) {
+  global string $hs_nameSpace_ToraGuard;
+  string $charSuffix = `radioCollection   -q -select   hs_whichChar_rc`;
+  if ($charSuffix == "Ak")
+    $hs_nameSpace_ToraGuard = "Akooman_R";
+  else if ($charSuffix == "Ba")
+    $hs_nameSpace_ToraGuard = "Bahman_R";
+  else if ($charSuffix == "In")
+    $hs_nameSpace_ToraGuard = "Indira_R";
+  else if ($charSuffix == "Sa")
+    $hs_nameSpace_ToraGuard = "Savool_R";
+  else if ($charSuffix == "Sh")
+    $hs_nameSpace_ToraGuard = "Shahriv_R";
+  else if ($charSuffix == "Or")
+    $hs_nameSpace_ToraGuard = "Ordib_R";
+  else if ($charSuffix == "Be")
+    $hs_nameSpace_ToraGuard = "Behrokh_R";
+  else if ($charSuffix == "Po")
+    $hs_nameSpace_ToraGuard = "Poolad_R";
+  else if ($charSuffix == "Pr")
+    $hs_nameSpace_ToraGuard = "Pooran_R";
+  else if ($charSuffix == "Pz")
+    $hs_nameSpace_ToraGuard = "Pirooz_R";
+  else if ($charSuffix == "Mj")
+    $hs_nameSpace_ToraGuard = "Mojneshin_R";
+  else if ($charSuffix == "Gu")
+    $hs_nameSpace_ToraGuard = getGuardNamespace();    
+  else if ($charSuffix == "Om")
+    $hs_nameSpace_ToraGuard = "OldMan_R";        
+ 
+  string $root = $hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix;
+  switch ($part) {
+    case "h1":        // head stretchy
+      string $stretchyAttr = "neck_stretchy";
+      hs_stretchyConfig_func( $root, $stretchyAttr );
+    break;
+    case "h2":        // head switch
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":M_neck_" + $charSuffix;
+      string $null = $hs_nameSpace_ToraGuard + ":M_neck_Nul_" + $charSuffix;
+      string $switchAttr = "switch";
+      hs_switchConfig_func( $IkIcon, $null, $switchAttr );
+    break;
+    //-------------------------------------
+    case "b1":        // back stretchy
+      string $stretchyAttr = "back_stretchy";
+      hs_stretchyConfig_func( $root, $stretchyAttr );
+    break;
+    case "b2":        // back switch
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":M_backEnd_" + $charSuffix;
+      string $null = $hs_nameSpace_ToraGuard + ":M_backEnd_Nul_" + $charSuffix;
+      string $switchAttr = "switch";
+      hs_switchConfig_func( $IkIcon, $null, $switchAttr );
+    break;
+    //-------------------------------------
+    case "la1":        // left arm Ik/Fk
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":L_hand_" + $charSuffix;
+      string $firstJoint = $hs_nameSpace_ToraGuard + ":L_shoulder_Jnt_" + $charSuffix;
+      string $midJoint = $hs_nameSpace_ToraGuard + ":L_elbow_Jnt_" + $charSuffix;
+      string $endJoint = $hs_nameSpace_ToraGuard + ":L_wrist_Jnt_" + $charSuffix;
+      string $handRot = $hs_nameSpace_ToraGuard + ":L_handRot_" + $charSuffix;
+      string $IkFkAttr = "LArm_IkFk";
+      string $stretchyAttr = "LArm_stretchy";
+      hs_IkFkConfig_func( $root, $IkIcon, $firstJoint, $midJoint, $endJoint, $handRot, $IkFkAttr, $stretchyAttr );
+    break;
+    case "la2":        // left arm stretchy
+      string $stretchyAttr = "LArm_stretchy";
+      hs_stretchyConfig_func( $root, $stretchyAttr );
+    break;
+    case "la3":        // left arm switch
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":L_hand_" + $charSuffix;
+      string $null = $hs_nameSpace_ToraGuard + ":L_hand_Nul_" + $charSuffix;
+      string $switchAttr = "switch";
+      hs_switchConfig_func( $IkIcon, $null, $switchAttr );
+    break;
+    //-------------------------------------
+    case "ra1":        // right arm Ik/Fk
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":R_hand_" + $charSuffix;
+      string $firstJoint = $hs_nameSpace_ToraGuard + ":R_shoulder_Jnt_" + $charSuffix;
+      string $midJoint = $hs_nameSpace_ToraGuard + ":R_elbow_Jnt_" + $charSuffix;
+      string $endJoint = $hs_nameSpace_ToraGuard + ":R_wrist_Jnt_" + $charSuffix;
+      string $handRot = $hs_nameSpace_ToraGuard + ":R_handRot_" + $charSuffix;
+      string $IkFkAttr = "RArm_IkFk";
+      string $stretchyAttr = "RArm_stretchy";
+      hs_IkFkConfig_func( $root, $IkIcon, $firstJoint, $midJoint, $endJoint, $handRot, $IkFkAttr, $stretchyAttr );
+    break;
+    case "ra2":        // right arm stretchy
+      string $stretchyAttr = "RArm_stretchy";
+      hs_stretchyConfig_func( $root, $stretchyAttr );  
+    break;
+    case "ra3":        // right arm switch
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":R_hand_" + $charSuffix;
+      string $null = $hs_nameSpace_ToraGuard + ":R_hand_Nul_" + $charSuffix;
+      string $switchAttr = "switch";
+      hs_switchConfig_func( $IkIcon, $null, $switchAttr );
+    break;
+    //-------------------------------------
+    case "ll1":        // left leg Ik/Fk
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":L_foot_" + $charSuffix;
+      string $firstJoint = $hs_nameSpace_ToraGuard + ":L_hip_Jnt_" + $charSuffix;
+      string $midJoint = $hs_nameSpace_ToraGuard + ":L_knee_Jnt_" + $charSuffix;
+      string $endJoint = $hs_nameSpace_ToraGuard + ":L_ankle_Jnt_" + $charSuffix;
+      string $IkFkAttr = "LLeg_IkFk";
+      string $stretchyAttr = "LLeg_stretchy";
+      hs_IkFkConfig_func( $root, $IkIcon, $firstJoint, $midJoint, $endJoint, "", $IkFkAttr, $stretchyAttr );
+    break;
+    case "ll2":        // left leg stretchy
+      string $stretchyAttr = "LLeg_stretchy";
+      hs_stretchyConfig_func( $root, $stretchyAttr );  
+    break;    
+    case "ll3":        // left leg switch
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":L_foot_" + $charSuffix;
+      string $null = $hs_nameSpace_ToraGuard + ":L_foot_Nul_" + $charSuffix;
+      string $switchAttr = "switch";
+      hs_switchConfig_func( $IkIcon, $null, $switchAttr );
+    break;
+    //-------------------------------------
+    case "rl1":        // right leg Ik/Fk
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":R_foot_" + $charSuffix;
+      string $firstJoint = $hs_nameSpace_ToraGuard + ":R_hip_Jnt_" + $charSuffix;
+      string $midJoint = $hs_nameSpace_ToraGuard + ":R_knee_Jnt_" + $charSuffix;
+      string $endJoint = $hs_nameSpace_ToraGuard + ":R_ankle_Jnt_" + $charSuffix;
+      string $IkFkAttr = "RLeg_IkFk";
+      string $stretchyAttr = "RLeg_stretchy";
+      hs_IkFkConfig_func( $root, $IkIcon, $firstJoint, $midJoint, $endJoint, "", $IkFkAttr, $stretchyAttr );
+    break;
+    case "rl2":        // right leg stretchy
+      string $stretchyAttr = "RLeg_stretchy";
+      hs_stretchyConfig_func( $root, $stretchyAttr );  
+    break;  
+    case "rl3":        // right leg switch
+      string $IkIcon = $hs_nameSpace_ToraGuard + ":R_foot_" + $charSuffix;
+      string $null = $hs_nameSpace_ToraGuard + ":R_foot_Nul_" + $charSuffix;
+      string $switchAttr = "switch";
+      hs_switchConfig_func( $IkIcon, $null, $switchAttr );
+    break;
+  }   // end switch
+}   
+      
+      
+      
+      
+global proc    hs_switchConfig_func (string $IkIcon, string $null, string $switchAttr) {
+  float $currentFrame = `currentTime -q`;
+  float $prevFrame = $currentFrame - 1;
+  int $switchy = `getAttr ($IkIcon + "." + $switchAttr)`;
+  if ($switchy == 1) {   // null
+    setKeyframe -t $prevFrame   -at t   -at r     $IkIcon;
+    setKeyframe -t $prevFrame   -at $switchAttr   -v 1   $IkIcon;
+    float $prevPos[3] = `xform  -q -ws -t     $IkIcon`;
+    float $prevRot[3] = `xform  -q -ws -ro     $IkIcon`;
+    setKeyframe -t $currentFrame   -at $switchAttr   -v 0   $IkIcon;
+    currentTime $currentFrame;
+    xform -ws -t  $prevPos[0] $prevPos[1] $prevPos[2]     $IkIcon;
+    setKeyframe  -t $currentFrame   -at t    $IkIcon;
+    xform -ws -ro  $prevRot[0] $prevRot[1] $prevRot[2]     $IkIcon;
+    setKeyframe  -t $currentFrame   -at r    $IkIcon;  
+  }
+  else {
+    setKeyframe -t $prevFrame   -at t   -at r     $IkIcon;
+    setKeyframe -t $prevFrame   -at $switchAttr   -v 0   $IkIcon;
+    float $prevPos[3] = `xform  -q -ws -t     $IkIcon`;
+    float $prevRot[3] = `xform  -q -ws -ro     $IkIcon`;
+    setKeyframe -t $currentFrame   -at $switchAttr   -v 1   $IkIcon;
+    currentTime $currentFrame;
+    xform -ws -t  $prevPos[0] $prevPos[1] $prevPos[2]     $IkIcon;
+    setKeyframe  -t $currentFrame   -at t    $IkIcon;
+    xform -ws -ro  $prevRot[0] $prevRot[1] $prevRot[2]     $IkIcon;
+    setKeyframe  -t $currentFrame   -at r    $IkIcon;     
+  }
+  hs_setCurrentConfig_func( "" );  
+}
+
+
+ 
+ 
+ 
+ 
+
+global proc   hs_IkFkConfig_func (string $root, string $IkIcon, string $firstJoint, string $midJoint, string $endJoint, string $handRot, string $IkFkAttr, string $stretchyAttr) {
+  float $currentFrame = `currentTime -q`;
+  float $prevFrame = $currentFrame - 1;
+  float $preFrame = $currentFrame - `getAttr ($root + ".IkFkBlendPre")`;
+  float $postFrame = $currentFrame + `getAttr ($root + ".IkFkBlendPost")`;  
+  int $IkFk = `getAttr ($root + "." + $IkFkAttr)`;
+  if ($IkFk == 1)  {     // IK
+    int $stretchy = `getAttr ($root + "." + $stretchyAttr)`;
+    if ($stretchy == 1) {
+      setKeyframe  -t $prevFrame      -at $stretchyAttr   -v 1  $root;
+      setAttr ($root + "." + $stretchyAttr) 0;
+      setKeyframe  -t $currentFrame      -at $stretchyAttr   -v 0  $root;
+    }
+    if ($handRot != "")   // for hand
+      setKeyframe  -t $currentFrame   -at r    $firstJoint    $midJoint   $handRot;
+    else   // for foot
+      setKeyframe  -t $currentFrame   -at r    $firstJoint    $midJoint;
+    setKeyframe  -t $preFrame      -at $IkFkAttr   -v 1  $root;
+    setAttr ($root + "." + $IkFkAttr)  0;
+    setKeyframe  -t $postFrame   -at $IkFkAttr   -v 0  $root;
+    currentTime $prevFrame;
+    currentTime $currentFrame;
+  }
+  else {    // FK
+    float $ikPos[3] = `xform -q -ws -t   $endJoint`;
+    xform -ws -t    ($ikPos[0]) ($ikPos[1]) ($ikPos[2])    $IkIcon;
+    setKeyframe  -t $currentFrame   -at t  -at r    $IkIcon;   
+    setKeyframe  -t $preFrame   -at $IkFkAttr  -v 0   $root;
+    setAttr ($root + "." + $IkFkAttr)  1;
+    setKeyframe  -t $postFrame      -at $IkFkAttr  -v 1   $root;
+  }
+  hs_setCurrentConfig_func( "" );
+}
+    
+
+ 
+global proc   hs_stretchyConfig_func (string $root, string $stretchyAttr) {
+  float $currentFrame = `currentTime -q`;
+  float $prevFrame = $currentFrame - 1;
+  int $stretchy = `getAttr ($root + "." + $stretchyAttr)`;
+  if ($stretchy == 0) {
+    setKeyframe  -t $prevFrame      -at $stretchyAttr   -v 0  $root;
+    setAttr ($root + "." + $stretchyAttr) 1;
+    setKeyframe  -t $currentFrame      -at $stretchyAttr   -v 1  $root;
+  }
+  else {
+    setKeyframe  -t $prevFrame      -at $stretchyAttr   -v 1  $root;
+    setAttr ($root + "." + $stretchyAttr) 0;
+    setKeyframe  -t $currentFrame      -at $stretchyAttr   -v 0  $root;
+  }
+  hs_setCurrentConfig_func( "" );
+}
+  
+
+
+
+
+  
+global proc   hs_setCurrentConfig_func (string $charSuffix) {
+  
+  global string $hs_nameSpace_ToraGuard;
+  global string $hs_IkFkLabel;
+  global string $hs_stretchyLabel;
+  global string $hs_switchLabel;
+  
+  $charSuffix = `radioCollection  -q -select    hs_whichChar_rc`;
+  if ($charSuffix == "Ak")
+    $hs_nameSpace_ToraGuard = "Akooman_R";
+  else if ($charSuffix == "Ba")
+    $hs_nameSpace_ToraGuard = "Bahman_R";
+  else if ($charSuffix == "In")
+    $hs_nameSpace_ToraGuard = "Indira_R";
+  else if ($charSuffix == "Sa")
+    $hs_nameSpace_ToraGuard = "Savool_R";
+  else if ($charSuffix == "Sh")
+    $hs_nameSpace_ToraGuard = "Shahriv_R";
+  else if ($charSuffix == "Or")
+    $hs_nameSpace_ToraGuard = "Ordib_R";
+  else if ($charSuffix == "Be")
+    $hs_nameSpace_ToraGuard = "Behrokh_R";
+  else if ($charSuffix == "Po")
+    $hs_nameSpace_ToraGuard = "Poolad_R";
+  else if ($charSuffix == "Pr")
+    $hs_nameSpace_ToraGuard = "Pooran_R";
+  else if ($charSuffix == "Pz")
+    $hs_nameSpace_ToraGuard = "Pirooz_R";
+  else if ($charSuffix == "Mj")
+    $hs_nameSpace_ToraGuard = "Mojneshin_R";
+  else if ($charSuffix == "Gu")
+    $hs_nameSpace_ToraGuard = getGuardNamespace();  
+  else if ($charSuffix == "Om")
+    $hs_nameSpace_ToraGuard = "OldMan_R";
+    
+  // neck stretchy
+  string $stretchy = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".neck_stretchy")`;
+  if ($stretchy == 0)
+    button -e -l  ($hs_stretchyLabel + " Off")   h1;
+  else
+    button -e -l  ($hs_stretchyLabel + " On")    h1;
+  // neck switch
+  string $switched = `getAttr ($hs_nameSpace_ToraGuard + ":M_neck_" + $charSuffix + ".switch")`;
+  if ($switched == 0)
+    button -e -l  ($hs_switchLabel + " Free")   h2;
+  else
+    button -e -l  ($hs_switchLabel + " Lock")    h2;  
+    
+//---------------------------------------------------
+
+  // back stretchy
+  string $stretchy = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".back_stretchy")`;
+  if ($stretchy == 0)
+    button -e -l  ($hs_stretchyLabel + " Off")   b1;
+  else
+    button -e -l  ($hs_stretchyLabel + " On")    b1;
+  // back switch
+  string $switched = `getAttr ($hs_nameSpace_ToraGuard + ":M_backEnd_" + $charSuffix + ".switch")`;
+  if ($switched == 0)
+    button -e -l  ($hs_switchLabel + " Free")   b2;
+  else
+    button -e -l  ($hs_switchLabel + " Lock")    b2;  
+
+//---------------------------------------------------
+    
+  // left arm stretchy
+  $stretchy = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".LArm_stretchy")`;
+  if ($stretchy == 0)
+    button -e -l  ($hs_stretchyLabel + " Off")   la2;
+  else
+    button -e -l  ($hs_stretchyLabel + " On")    la2;
+  // left arm Ik/Fk
+  string $IkFk = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".LArm_IkFk")`;
+  if ($IkFk == 0) {
+    button -e -l  ($hs_IkFkLabel + " FK")   la1;
+    iconTextButton -e -en 0    lh;
+  }
+  else {
+    button -e -l  ($hs_IkFkLabel + " IK")    la1;
+    iconTextButton -e -en 1    lh;
+  }
+  // left arm switch
+  string $switched = `getAttr ($hs_nameSpace_ToraGuard + ":L_hand_" + $charSuffix + ".switch")`;
+  if ($switched == 0)
+    button -e -l  ($hs_switchLabel + " Free")   la3;
+  else
+    button -e -l  ($hs_switchLabel + " Lock")    la3;  
+    
+//---------------------------------------------------    
+
+  // right arm stretchy
+  $stretchy = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".RArm_stretchy")`;
+  if ($stretchy == 0)
+    button -e -l  ($hs_stretchyLabel + " Off")   ra2;
+  else
+    button -e -l  ($hs_stretchyLabel + " On")    ra2;
+
+  // right arm Ik/Fk
+  string $IkFk = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".RArm_IkFk")`;
+  if ($IkFk == 0) {
+    button -e -l  ($hs_IkFkLabel + " FK")   ra1;
+    iconTextButton -e -en 0    rh;
+  }
+  else {
+    button -e -l  ($hs_IkFkLabel + " IK")    ra1;
+    iconTextButton -e -en 1    rh;
+  }
+  // right arm switch
+  string $switched = `getAttr ($hs_nameSpace_ToraGuard + ":R_hand_" + $charSuffix + ".switch")`;
+  if ($switched == 0)
+    button -e -l  ($hs_switchLabel + " Free")   ra3;
+  else
+    button -e -l  ($hs_switchLabel + " Lock")    ra3; 
+        
+//--------------------------------------------------- 
+   
+  // left leg stretchy
+  $stretchy = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".LLeg_stretchy")`;
+  if ($stretchy == 0)
+    button -e -l  ($hs_stretchyLabel + " Off")   ll2;
+  else
+    button -e -l  ($hs_stretchyLabel + " On")    ll2;
+  // left leg Ik/Fk
+  string $IkFk = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".LLeg_IkFk")`;
+  if ($IkFk == 0) {
+    button -e -l  ($hs_IkFkLabel + " FK")   ll1;
+    iconTextButton -e -en 0    lf;
+  }
+  else {
+    button -e -l  ($hs_IkFkLabel + " IK")    ll1;
+    iconTextButton -e -en 1    lf;
+  }
+  // left leg switch
+  string $switched = `getAttr ($hs_nameSpace_ToraGuard + ":L_foot_" + $charSuffix + ".switch")`;
+  if ($switched == 0)
+    button -e -l  ($hs_switchLabel + " Free")   ll3;
+  else
+    button -e -l  ($hs_switchLabel + " Lock")    ll3;  
+    
+//---------------------------------------------------
+   
+  // right leg stretchy
+  $stretchy = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".RLeg_stretchy")`;
+  if ($stretchy == 0)
+    button -e -l  ($hs_stretchyLabel + " Off")   rl2;
+  else
+    button -e -l  ($hs_stretchyLabel + " On")    rl2;
+  // right leg Ik/Fk
+  string $IkFk = `getAttr ($hs_nameSpace_ToraGuard + ":M_root_" + $charSuffix + ".RLeg_IkFk")`;
+  if ($IkFk == 0) {
+    button -e -l  ($hs_IkFkLabel + " FK")   rl1;
+    iconTextButton -e -en 0    rf;
+  }
+  else {
+    button -e -l  ($hs_IkFkLabel + " IK")    rl1;
+    iconTextButton -e -en 1    rf;
+  }
+  // right leg switch
+  string $switched = `getAttr ($hs_nameSpace_ToraGuard + ":R_foot_" + $charSuffix + ".switch")`;
+  if ($switched == 0)
+    button -e -l  ($hs_switchLabel + " Free")   rl3;
+  else
+    button -e -l  ($hs_switchLabel + " Lock")    rl3;  
+ 
+//---------------------------------------------------
+
+  string $faceCam = $hs_nameSpace_ToraGuard + ":faceCam_" + $charSuffix;
+  if (`objExists   $faceCam`) {
+    if (`modelPanel  -exists   hs_faceCam_mp`)
+      deleteUI   -pnl    hs_faceCam_mp;
+    modelPanel  -cam $faceCam    -mbv 0    -p hs_faceCamPane_pl    hs_faceCam_mp;
+  }
+  
+}
+
+  
+  

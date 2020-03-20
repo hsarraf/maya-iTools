@@ -1,0 +1,121 @@
+if (`window -exists   texManager_Win_TM`)
+  deleteUI    texManager_Win_TM;
+
+window -t "Texture Manager"		texManager_Win_TM;
+columnLayout -adj 1;
+
+string $currentProjectPath = `workspace -fn`;
+text -l "Current Project Path";
+text -l $currentProjectPath;
+
+separator -h 15;
+
+textFieldGrp -l "Textures Folder Name"  -text "sourceimages"	-h 18 -adj 1  -cal 1 left texFolderName_Tf_TM;
+button -l "Generate" -h 18 -c "generate_Proc_TM";
+//button -l "Check If Any Texture File Remained"  -h 18 -c  "checktexFile_Proc_TM";
+
+frameLayout -l  "Log";
+  columnLayout -adj 1;
+   textScrollList -numberOfRows 15  -en 1  log_Txt_TM;
+   button -l "Clean Log" -h 18 -c "textScrollList -e -ra  log_Txt_TM";
+  setParent..;
+setParent..;
+
+
+showWindow   texManager_Win_TM;
+
+
+
+global proc   generate_Proc_TM() {		//  the main proc to generate the task of copying and changing the files
+
+string $texFileList[] = `ls -typ file`;	//  list all the texture files
+string $thisTexFile;
+
+global string $gMainProgressBar;	// recall the global string for progress bar
+progressBar -edit	//  edit the progress bar based on the calculation
+    -beginProgress
+    -isInterruptable true
+    -status "Calculation Texture Manager..."
+    -minValue 0
+    -maxValue (max( 1, (size( $texFileList )) ))
+    $gMainProgressBar;
+
+for ($thisTexFile in $texFileList) {	// move on every texture file
+  string $currentTexFile = `getAttr ($thisTexFile + ".fileTextureName")`;  //  get the current texture file name
+  if (!`filetest -e  $currentTexFile`) {		// check if this file exists
+	string $log = "not copied,     the file deos not exist,  " + $currentTexFile;
+	textScrollList -e -append  $log   log_Txt_TM;	// if not then append this maessage to the textbar
+	continue;
+  } //  end if 
+
+  string $texLocation = `textFieldGrp -q -text   texFolderName_Tf_TM`;  // get the texture location given by the user, default sourceimages
+  string $targetTexFile = `workspace -fn` + "/" + $texLocation + "/" + getTexFileName_Proc_TM( $currentTexFile );	// make the target path based on the current project
+/*
+  if (`filetest -e  $targetTexFile`) {  //  check if the target path exists
+	string $log = "not copied, changed,     the file already existed,  " + $targetTexFile;
+	textScrollList -e -append  $log   log_Txt_TM;
+	continue;
+  } //  end if 
+*/
+  if ($targetTexFile == $currentTexFile)		// check if the texture file is copied
+	continue;		//  if true then do nothing
+
+  sysFile -copy  $targetTexFile   $currentTexFile;	// copy the texture from the previouspath to the project path
+  string $projTexFile = getProjPartName_Proc_TM( $currentTexFile );		//  get the project part of the texture file path, e.g. sourceimages/<texFileName.xxx>
+  setAttr -type "string" ($thisTexFile + ".fileTextureName") $projTexFile;  //  set the texture file name attribute of this texture
+  string $log = "copied, changed,      " + $currentTexFile + "   -->   " + $targetTexFile;
+  textScrollList -e -append  $log   log_Txt_TM;		// make the log reporting the file is copied
+ 
+  progressBar -edit -step 1 $gMainProgressBar;	  // step over the progress bar
+
+} //  end for
+
+progressBar -edit	//  end the progress bar
+    -endProgress
+    $gMainProgressBar;
+
+
+} //  end proc   generate_Proc_TM
+
+/*
+global proc    checktexFile_Proc_TM() {
+
+}
+*/
+
+global proc string   getTexFileName_Proc_TM (string $texPath) {  //  this proc gets a path and gives the name part of the path
+
+  string $parts[];
+  tokenize $texPath "/" $parts;
+  return $parts[size( $parts ) - 1];
+
+} //  end proc  getTexFileName_Proc_TM
+
+
+
+
+global proc   string  getProjPartName_Proc_TM (string $currentTexFile) {	//  this proc gets the full path and gives the project form of that path
+
+string $parts[];
+tokenize   $currentTexFile "/" $parts;
+
+string $texLocation = `textFieldGrp -q -text  texFolderName_Tf_TM`;
+
+int $i = 0;
+int $partsSize = size( $parts );
+string $projPath = "";
+while ($parts[$partsSize - 1] != $texLocation) {
+  $projPath = "/" + $parts[$partsSize - 1] + $projPath;
+  $partsSize--;
+  if ($partsSize == 0) {
+	error ("unknon texture location is defined <" + $texLocation + ">!!"); 
+	break;
+  } //   end if
+} //  end while
+
+$projPath = $parts[$partsSize - 1] + $projPath;
+
+return $projPath;
+
+
+}  // end proc  getProjPartName_Proc_TM
